@@ -42,7 +42,7 @@ module RedmineMessenger
                                      short: true }]
             if assigned_to.present?
               attachment[:fields] << { title: I18n.t(:field_assigned_to),
-                                       value: Messenger.markup_format(assigned_to.to_s),
+                                       value: Messenger.markup_format(convert_to_slack_mention(assigned_to)),
                                        short: true }
             end
 
@@ -55,7 +55,7 @@ module RedmineMessenger
             if RedmineMessenger.setting?(:display_watchers) && watcher_users.count.positive?
               attachment[:fields] << {
                 title: I18n.t(:field_watcher),
-                value: Messenger.markup_format(watcher_users.join(', ')),
+                value: Messenger.markup_format(watcher_users.map { |watcher| [convert_to_slack_mention(watcher)] }.join(', ')),
                 short: true
               }
             end
@@ -106,6 +106,14 @@ module RedmineMessenger
             fields.compact!
             attachment[:fields] = fields if fields.any?
 
+            if RedmineMessenger.setting?(:display_watchers) && watcher_users.count.positive?
+              attachment[:fields] << {
+                title: I18n.t(:field_watcher),
+                value: Messenger.markup_format(watcher_users.map { |watcher| [convert_to_slack_mention(watcher)] }.join(', ')),
+                short: true
+              }
+            end
+
             Messenger.speak l(:label_messenger_issue_updated,
                               project_url: Messenger.project_url_markdown(project),
                               url: send_messenger_mention_url(project, description),
@@ -134,6 +142,10 @@ module RedmineMessenger
           else
             "<#{Messenger.object_url self}#change-#{current_journal.id}|#{Messenger.markup_format self}>#{mention_to}"
           end
+        end
+
+        def convert_to_slack_mention(user)
+          "<@#{user.mail.split("@")[0]}>"
         end
       end
     end

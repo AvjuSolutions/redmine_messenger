@@ -267,6 +267,15 @@ class Messenger
       obj.nil? ? id.to_s : obj.to_s
     end
 
+    def convert_to_slack_mention(user)
+      "<@#{user.mail.split("@")[0]}>"
+    end
+
+    def object_field_mention(klass, id)
+      obj = klass.find_by id: id
+      obj.nil? ? id.to_s : convert_to_slack_mention(obj)
+    end
+
     def extract_usernames(text)
       return [] if text.blank?
 
