@@ -215,7 +215,7 @@ class Messenger
       when 'category'
         value = object_field_value IssueCategory, detail.value
       when 'assigned_to', 'author'
-        value = object_field_value Principal, detail.value
+        value = object_field_mention Principal, detail.value
       when 'fixed_version'
         value = object_field_value Version, detail.value
       when 'attachment'
@@ -268,7 +268,7 @@ class Messenger
     end
 
     def convert_to_slack_mention(user)
-      "<@#{user.mail.split("@")[0]}>"
+      "@#{user.mail.split("@")[0]}"
     end
 
     def object_field_mention(klass, id)

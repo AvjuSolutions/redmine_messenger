@@ -145,7 +145,7 @@ module RedmineMessenger
         end
 
         def convert_to_slack_mention(user)
-          "<@#{user.mail.split("@")[0]}>"
+          "@#{user.mail.split("@")[0]}"
         end
       end
     end
